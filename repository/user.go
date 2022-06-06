@@ -112,31 +112,31 @@ func UnFollowOthers(currentUserId int64, toUserId int64) error {
 	return err
 }
 
-func QueryFollowListById(userId int64) ([]DbUser, error) {
+func QueryFollowListById(userId int64) ([]entity.User, error) {
 	sub := []DbFollow{}
 	db.Model(&DbFollow{}).Where("id = ?", userId).Find(&sub)
-	results := make([]DbUser, len(sub))
+	results := make([]entity.User, len(sub))
 	for i, v := range sub {
 		user := DbUser{}
 		err := db.Model(&DbUser{}).Where("id = ?", v.FollowId).Find(&user).Error
 		if err != nil {
 			return nil, err
 		}
-		results[i] = user
+		results[i] = copyUser(user)
 	}
 	return results, nil
 }
-func QueryFollowerListById(userId int64) ([]DbUser, error) {
+func QueryFollowerListById(userId int64) ([]entity.User, error) {
 	sub := []DbFollower{}
 	db.Model(&DbFollower{}).Where("id = ?", userId).Find(&sub)
-	results := make([]DbUser, len(sub))
+	results := make([]entity.User, len(sub))
 	for i, v := range sub {
 		user := DbUser{}
 		err := db.Model(&DbUser{}).Where("id = ?", v.FollowerId).Find(&user).Error
 		if err != nil {
 			return nil, err
 		}
-		results[i] = user
+		results[i] = copyUser(user)
 	}
 	return results, nil
 }

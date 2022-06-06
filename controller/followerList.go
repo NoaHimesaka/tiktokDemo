@@ -32,6 +32,7 @@ func FollowerList(ctx *gin.Context) {
 		})
 		return
 	}
+
 	ctx.JSON(http.StatusOK, FollowListResponse{
 		Response: entity.Response{StatusCode: 0, StatusMsg: "获取列表成功"},
 		UserList: &followerList,
