@@ -26,3 +26,21 @@ type DbUser struct {
 func (DbUser) TableName() string {
 	return "dyuser"
 }
+
+type DbFollow struct {
+	Id       int64 `gorm:"column:id"`
+	FollowId int64 `gorm:"column:follow_id"`
+}
+
+func (DbFollow) TableName() string {
+	return "dyfollow"
+}
+
+type DbFollower struct {
+	Id         int64 `gorm:"column:id"`
+	FollowerId int64 `gorm:"column:follower_id"`
+}
+
+func (DbFollower) TableName() string {
+	return "dyfollower"
+}
