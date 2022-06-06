@@ -15,6 +15,16 @@ func (dbVideo) TableName() string {
 	return "dyvideo"
 }
 
+type UserFavorite struct {
+	Id     int64
+	User   DbUser    `gorm:"ForeignKey:Id"`
+	Videos []dbVideo `gorm:"many2many:userFavoriteVideo"`
+}
+
+func (UserFavorite) TableName() string {
+	return "favoriteList"
+}
+
 type DbUser struct {
 	Id            int64
 	Username      string

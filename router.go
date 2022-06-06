@@ -2,6 +2,7 @@ package main
 
 import (
 	"douyinProject/controller"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -20,8 +21,8 @@ func initRouter(r *gin.Engine) {
 	apiRouter.GET("/publish/list/", controller.Publishlist)
 	//
 	//// extra apis - I
-	//apiRouter.POST("/favorite/action/", controller.FavoriteAction)
-	//apiRouter.GET("/favorite/list/", controller.FavoriteList)
+	apiRouter.POST("/favorite/action/", controller.FavoriteAction)
+	apiRouter.GET("/favorite/list/", controller.FavoriteList)
 	//apiRouter.POST("/comment/action/", controller.CommentAction)
 	//apiRouter.GET("/comment/list/", controller.CommentList)
 	//
