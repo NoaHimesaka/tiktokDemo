@@ -7,8 +7,11 @@ import (
 	"errors"
 )
 
-func FavoriteAction(uid int64, video_id string, action_type string) (int64, error) {
+func FavoriteAction(user_id string, token string, video_id string, action_type string) (int64, error) {
 	// 转换并校验参数
+	uid := utils.Int64(user_id, func() int64 {
+		return repository.GetUserByToken(token)
+	})
 	vid := utils.Int64(video_id, func() int64 {
 		return -1
 	})
@@ -23,7 +26,10 @@ func FavoriteAction(uid int64, video_id string, action_type string) (int64, erro
 	}
 	return action, repository.DoFavorite(action, vid, uid)
 }
-func GetFavorite(uid int64) (*[]entity.Video, error) {
+func GetFavorite(user_id string, token string) (*[]entity.Video, error) {
+	uid := utils.Int64(user_id, func() int64 {
+		return repository.GetUserByToken(token)
+	})
 	videos := repository.FavoriteList(uid)
 	return videos, nil
 }

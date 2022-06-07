@@ -25,13 +25,13 @@ func DoFavorite(act int64, video_id int64, user_id int64) error {
 	curFavorite := video.Favoritecount // 当前点赞数量
 	//准备用户点赞列表
 	favoriteList := UserFavorite{}
-	result = db.Model(&UserFavorite{}).Where(DbUser{Id: user_id}).Preload("Videos").Find(&favoriteList)
+	result = db.Model(&UserFavorite{User: curUser}).Find(&favoriteList)
 	if result.Error != nil || favoriteList.Id == 0 { //若无则创建
 		favoriteList = UserFavorite{
 			User: curUser,
 		}
 		db.Create(&favoriteList)
-		db.Model(&UserFavorite{}).Where(DbUser{Id: user_id}).Preload("Videos").Find(&favoriteList)
+		db.Model(&UserFavorite{User: curUser}).Find(&favoriteList)
 	}
 	if favoriteList.Id == 0 {
 		return errors.New("操作失败")

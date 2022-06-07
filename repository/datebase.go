@@ -1,6 +1,8 @@
 package repository
 
 import (
+	"log"
+
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 )
@@ -21,6 +23,9 @@ func Init() {
 	}
 	db = database
 	//自动迁移，保证数据库是最新的
+	if err := db.AutoMigrate(&UserFavorite{}); err != nil {
+		log.Fatal(err)
+	}
 }
 
 //测试用, 后续应该更改方案
