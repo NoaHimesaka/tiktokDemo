@@ -14,7 +14,7 @@ type comm struct {
 	List []repository.Result `json:"comment_list"`
 }
 
-func GetComment(c *gin.Context) {
+func CommentList(c *gin.Context) {
 	token := c.Query("token")
 	videoId := c.Query("video_id")
 	if utils.TokenCheck(token) == true {

@@ -19,14 +19,12 @@ func initRouter(r *gin.Engine) {
 	apiRouter.POST("/user/login/", controller.Login)
 	apiRouter.POST("/publish/action/", controller.Publish)
 	apiRouter.GET("/publish/list/", controller.Publishlist)
-	apiRouter.POST("/comment/action/", controller.Comment)
-	apiRouter.GET("/comment/list/", controller.GetComment)
 	//
 	//// extra apis - I
 	apiRouter.POST("/favorite/action/", controller.FavoriteAction)
 	apiRouter.GET("/favorite/list/", controller.FavoriteList)
-	//apiRouter.POST("/comment/action/", controller.CommentAction)
-	//apiRouter.GET("/comment/list/", controller.CommentList)
+	apiRouter.POST("/comment/action/", controller.CommentAction)
+	apiRouter.GET("/comment/list/", controller.CommentList)
 	//
 	//// extra apis - II
 	//apiRouter.POST("/relation/action/", controller.RelationAction)

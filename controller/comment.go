@@ -24,7 +24,7 @@ type comment struct {
 	Create_data string      `json:"create_data"`
 }
 
-func Comment(c *gin.Context) {
+func CommentAction(c *gin.Context) {
 	token := c.Query("token")
 	video_id := c.Query("video_id")
 	action_type := c.Query("action_type")
