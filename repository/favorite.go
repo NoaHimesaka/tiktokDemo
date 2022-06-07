@@ -50,6 +50,7 @@ func DoFavorite(act int64, video_id int64, user_id int64) error {
 		for _, v := range favoriteList.Videos {
 			if v.Id == video_id {
 				ok = true
+				break
 			}
 		}
 		if !ok {
