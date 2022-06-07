@@ -5,7 +5,7 @@ import (
 	"gorm.io/gorm"
 )
 
-var dsn = "root:153359157aA@tcp(localhost:3306)/douyin?charset=utf8mb4&parseTime=True&loc=Local"
+var dsn = "root:123456@tcp(localhost:3306)/douyin?charset=utf8mb4&parseTime=True&loc=Local"
 var db *gorm.DB
 
 //type StoredUser struct {
