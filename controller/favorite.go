@@ -2,6 +2,7 @@ package controller
 
 import (
 	"douyinProject/entity"
+	"douyinProject/repository"
 	"douyinProject/service"
 	"net/http"
 
@@ -16,9 +17,10 @@ type FavoriteListResponce struct {
 }
 
 func FavoriteAction(ctx *gin.Context) {
-	userId := ctx.Query("user_id")
 	video_id := ctx.Query("video_id")
+	token := ctx.Query("token")
 	action_type := ctx.Query("action_type")
+	userId := repository.GetUserByToken(token)
 	act, err := service.FavoriteAction(userId, video_id, action_type)
 	if err != nil {
 		ctx.JSON(http.StatusOK, entity.Response{
@@ -33,7 +35,8 @@ func FavoriteAction(ctx *gin.Context) {
 	})
 }
 func FavoriteList(ctx *gin.Context) {
-	userId := ctx.Query("user_id")
+	token := ctx.Query("token")
+	userId := repository.GetUserByToken(token)
 	video, err := service.GetFavorite(userId)
 	if err != nil {
 		ctx.JSON(http.StatusOK, FavoriteListResponce{
