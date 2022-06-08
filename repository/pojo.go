@@ -17,7 +17,8 @@ func (dbVideo) TableName() string {
 
 type UserFavorite struct {
 	Id     int64
-	User   DbUser    `gorm:"ForeignKey:Id"`
+	UserId int64
+	User   DbUser    `gorm:"ForeignKey:UserId"`
 	Videos []dbVideo `gorm:"many2many:userFavoriteVideo"`
 }
 

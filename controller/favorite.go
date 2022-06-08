@@ -16,10 +16,11 @@ type FavoriteListResponce struct {
 }
 
 func FavoriteAction(ctx *gin.Context) {
-	userId := ctx.Query("user_id")
 	video_id := ctx.Query("video_id")
+	userId := ctx.Query("user_id")
+	token := ctx.Query("token")
 	action_type := ctx.Query("action_type")
-	act, err := service.FavoriteAction(userId, video_id, action_type)
+	act, err := service.FavoriteAction(userId, token, video_id, action_type)
 	if err != nil {
 		ctx.JSON(http.StatusOK, entity.Response{
 			StatusCode: 1,
@@ -34,7 +35,8 @@ func FavoriteAction(ctx *gin.Context) {
 }
 func FavoriteList(ctx *gin.Context) {
 	userId := ctx.Query("user_id")
-	video, err := service.GetFavorite(userId)
+	token := ctx.Query("token")
+	video, err := service.GetFavorite(userId, token)
 	if err != nil {
 		ctx.JSON(http.StatusOK, FavoriteListResponce{
 			Response: entity.Response{

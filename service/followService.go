@@ -1,6 +1,9 @@
 package service
 
-import "douyinProject/repository"
+import (
+	"douyinProject/entity"
+	"douyinProject/repository"
+)
 
 func FollowAction(currentUserId int64, toUserId int64, actionType int) error {
 
@@ -18,12 +21,12 @@ func FollowAction(currentUserId int64, toUserId int64, actionType int) error {
 	return nil
 }
 
-func FollowListAction(toUserId int64) (list []repository.DbUser, err error) {
+func FollowListAction(toUserId int64) (list []entity.User, err error) {
 	list, err = repository.QueryFollowListById(toUserId)
 	return
 }
 
-func FollowerListAction(toUserId int64) (list []repository.DbUser, err error) {
+func FollowerListAction(toUserId int64) (list []entity.User, err error) {
 	list, err = repository.QueryFollowerListById(toUserId)
 	return
 }

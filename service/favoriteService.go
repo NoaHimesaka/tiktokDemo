@@ -7,14 +7,11 @@ import (
 	"errors"
 )
 
-func FavoriteAction(userId string, video_id string, action_type string) (int64, error) {
+func FavoriteAction(user_id string, token string, video_id string, action_type string) (int64, error) {
 	// 转换并校验参数
-	uid := utils.Int64(userId, func() int64 {
-		return -1
+	uid := utils.Int64(user_id, func() int64 {
+		return repository.GetUserByToken(token)
 	})
-	if uid == -1 {
-		return 0, errors.New("用户不存在")
-	}
 	vid := utils.Int64(video_id, func() int64 {
 		return -1
 	})
@@ -29,13 +26,10 @@ func FavoriteAction(userId string, video_id string, action_type string) (int64, 
 	}
 	return action, repository.DoFavorite(action, vid, uid)
 }
-func GetFavorite(userId string) (*[]entity.Video, error) {
-	uid := utils.Int64(userId, func() int64 {
-		return -1
+func GetFavorite(user_id string, token string) (*[]entity.Video, error) {
+	uid := utils.Int64(user_id, func() int64 {
+		return repository.GetUserByToken(token)
 	})
-	if uid == -1 {
-		return nil, errors.New("用户不存在")
-	}
 	videos := repository.FavoriteList(uid)
 	return videos, nil
 }

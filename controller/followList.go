@@ -2,17 +2,17 @@ package controller
 
 import (
 	"douyinProject/entity"
-	"douyinProject/repository"
 	"douyinProject/service"
 	"douyinProject/utils"
 	"errors"
-	"github.com/gin-gonic/gin"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 type FollowListResponse struct {
-	Response entity.Response      `json:"response,omitempty"`
-	UserList *[]repository.DbUser `json:"user_list,omitempty"`
+	Response entity.Response `json:"response,omitempty"`
+	UserList *[]entity.User  `json:"user_list,omitempty"`
 }
 
 func FollowList(ctx *gin.Context) {
