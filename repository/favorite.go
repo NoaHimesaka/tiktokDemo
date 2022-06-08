@@ -25,13 +25,13 @@ func DoFavorite(act int64, video_id int64, user_id int64) error {
 	curFavorite := video.Favoritecount // 当前点赞数量
 	//准备用户点赞列表
 	favoriteList := UserFavorite{}
-	result = db.Model(&UserFavorite{User: curUser}).Find(&favoriteList)
-	if result.Error != nil || favoriteList.Id == 0 { //若无则创建
+	result = db.Model(&UserFavorite{}).Where("user_id = ?", user_id).Preload("Videos").Find(&favoriteList)
+	if result.Error != nil || favoriteList.Id == 0 || favoriteList.UserId != user_id { //若无则创建
 		favoriteList = UserFavorite{
 			User: curUser,
 		}
 		db.Create(&favoriteList)
-		db.Model(&UserFavorite{User: curUser}).Find(&favoriteList)
+		db.Model(&UserFavorite{}).Where("user_id = ?", user_id).Preload("Videos").Find(&favoriteList)
 	}
 	if favoriteList.Id == 0 {
 		return errors.New("操作失败")
@@ -66,14 +66,21 @@ func DoFavorite(act int64, video_id int64, user_id int64) error {
 	}
 	return nil
 }
+
+var nullVideo = []dbVideo{}
+
 func FavoriteList(user_id int64) *[]entity.Video {
+	curUser := DbUser{Id: user_id}
 	list := UserFavorite{}
 	// 获取用户点赞列表
-	result := db.Model(&UserFavorite{}).Where(DbUser{Id: user_id}).Preload("Videos").Find(&list)
-	if errors.Is(result.Error, gorm.ErrRecordNotFound) || list.Id == 0 {
-		db.Create(&UserFavorite{User: DbUser{Id: user_id}})
+	result := db.Model(&UserFavorite{}).Where("user_id = ?", user_id).Preload("Videos").Find(&list)
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) || list.Id == 0 || list.UserId != user_id {
+		db.Create(&UserFavorite{User: curUser})
+		db.Model(&UserFavorite{}).Where("user_id = ?", user_id).Preload("Videos").Find(&list)
 	}
-
+	if list.Id == 0 || list.UserId != user_id {
+		list.Videos = nullVideo
+	}
 	res := make([]entity.Video, len(list.Videos))
 	for i, v := range list.Videos { // 转entity.Video
 		res[i] = copyValue(v)
