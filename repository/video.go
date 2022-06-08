@@ -72,3 +72,12 @@ func PublishList(authorid int64) (*[]entity.Video, error) {
 	}
 	return &curResult, result.Error
 }
+
+func GetVideoById(vid int64) (dbVideo, error) {
+	video := dbVideo{}
+	result := db.Where(&dbVideo{Id: vid}).Find(&video)
+	if result.Error != nil || video.Id != vid {
+		return video, errors.New("视频不存在")
+	}
+	return video, nil
+}
