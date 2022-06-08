@@ -24,7 +24,7 @@ func FavoriteAction(user_id string, token string, video_id string, action_type s
 	if action == 0 {
 		return 0, errors.New("未知行为")
 	}
-	return action, repository.DoFavorite(action, vid, uid)
+	return action, repository.FavoriteAct(action, vid, uid)
 }
 func GetFavorite(user_id string, token string) (*[]entity.Video, error) {
 	uid := utils.Int64(user_id, func() int64 {

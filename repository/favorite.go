@@ -7,66 +7,89 @@ import (
 	"gorm.io/gorm"
 )
 
-func DoFavorite(act int64, video_id int64, user_id int64) error {
-	curUser := DbUser{Id: user_id}
-	curVideo := dbVideo{Id: video_id}
-
-	//检查视频和用户是否存在
-	video := dbVideo{}
-	result := db.Where(curVideo).Find(&video)
-	if result.Error != nil || video.Id != video_id {
-		return errors.New("视频不存在")
+func FavoritePreCheck(vid int64, uid int64) (video dbVideo, err error) {
+	video, err = GetVideoById(vid)
+	if err != nil {
+		return
 	}
-	user := DbUser{}
-	result = db.Where(curUser).Find(&user)
-	if result.Error != nil || user.Id != user_id {
-		return errors.New("用户不存在")
-	}
-	curFavorite := video.Favoritecount // 当前点赞数量
-	//准备用户点赞列表
+	_, err = GetUserById(uid)
+	return
+}
+func GetFavoriteListByUser(uid int64) (UserFavorite, error) {
 	favoriteList := UserFavorite{}
-	result = db.Model(&UserFavorite{}).Where("user_id = ?", user_id).Preload("Videos").Find(&favoriteList)
-	if result.Error != nil || favoriteList.Id == 0 || favoriteList.UserId != user_id { //若无则创建
+	result := db.Model(&UserFavorite{}).Where("user_id = ?", uid).Preload("Videos").Find(&favoriteList)
+	if result.Error != nil || favoriteList.Id == 0 || favoriteList.UserId != uid { //若无则创建
 		favoriteList = UserFavorite{
-			User: curUser,
+			User: DbUser{Id: uid},
 		}
 		db.Create(&favoriteList)
-		db.Model(&UserFavorite{}).Where("user_id = ?", user_id).Preload("Videos").Find(&favoriteList)
-	}
-	if favoriteList.Id == 0 {
-		return errors.New("操作失败")
-	}
-	var err error
-	if act == 1 { // 点赞, 赞+1
-		for _, v := range favoriteList.Videos {
-			if v.Id == video_id {
-				return nil
-			}
+		db.Model(&UserFavorite{}).Where("user_id = ?", uid).Preload("Videos").Find(&favoriteList)
+		if favoriteList.Id == 0 {
+			return favoriteList, errors.New("操作失败")
 		}
-		db.Model(&curVideo).Update("Favoritecount", curFavorite+1)
-		err = db.Model(&favoriteList).Association("Videos").Append(&curVideo)
-	} else { //	取消, 赞-1
-		ok := false
-		for _, v := range favoriteList.Videos {
-			if v.Id == video_id {
-				ok = true
-				break
-			}
-		}
-		if !ok {
+	}
+	return favoriteList, nil
+}
+func DoFavorite(curVideo *dbVideo, favoriteList *UserFavorite) error {
+	for _, v := range favoriteList.Videos {
+		if v.Id == curVideo.Id {
 			return nil
 		}
-		db.Model(&curVideo).Update("Favoritecount", curFavorite-1)
-		err = db.Model(&favoriteList).Association("Videos").Delete(&curVideo)
 	}
-
+	db.Model(curVideo).Update("Favoritecount", curVideo.Favoritecount+1)
+	err := db.Model(favoriteList).Association("Videos").Append(&dbVideo{Id: curVideo.Id})
 	if err != nil {
-		db.Rollback() // 更新失败则回滚
 		return errors.New("操作失败")
 	}
 	return nil
 }
+func UnFavorite(curVideo *dbVideo, favoriteList *UserFavorite) error {
+	ok := false
+	for _, v := range favoriteList.Videos {
+		if v.Id == curVideo.Id {
+			ok = true
+			break
+		}
+	}
+	if !ok {
+		return nil
+	}
+	db.Model(curVideo).Update("Favoritecount", curVideo.Favoritecount-1)
+	err := db.Model(favoriteList).Association("Videos").Delete(&dbVideo{Id: curVideo.Id})
+	if err != nil {
+		return errors.New("操作失败")
+	}
+	return nil
+}
+func FavoriteAct(act int64, video_id int64, user_id int64) (err error) {
+	//检查视频和用户是否存在
+	video, err := FavoritePreCheck(video_id, user_id)
+	if err != nil {
+		return err
+	}
+	tx := db.Begin()
+	defer func() {
+		if err != nil {
+			tx.Rollback()
+			return
+		}
+		tx.Commit()
+	}()
+	//准备用户点赞列表
+	favoriteList, err := GetFavoriteListByUser(user_id)
+	if err != nil {
+		return err
+	}
+	switch act {
+	case 1:
+		err = DoFavorite(&video, &favoriteList)
+	case 2:
+		err = UnFavorite(&video, &favoriteList)
+	}
+	return
+}
 
+//空video
 var nullVideo = []dbVideo{}
 
 func FavoriteList(user_id int64) *[]entity.Video {
